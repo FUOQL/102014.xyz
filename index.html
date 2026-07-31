@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>李清波 — 计算机科学与技术</title>
+<meta name="description" content="李清波 - 计算机科学与技术专业，全栈开发与系统设计">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect x=%2725%27 y=%2715%27 width=%2750%27 height=%2738%27 rx=%274%27 fill=%27none%27 stroke=%27%2364ffda%27 stroke-width=%275%27/%3E%3Cline x1=%2725%27 y1=%2775%27 x2=%2775%27 y2=%2775%27 stroke=%27%2364ffda%27 stroke-width=%275%27 stroke-linecap=%27round%27/%3E%3Cline x1=%2750%27 y1=%2753%27 x2=%2750%27 y2=%2775%27 stroke=%27%2364ffda%27 stroke-width=%275%27 stroke-linecap=%27round%27/%3E%3Cpolyline points=%2732,34 42,44 32,54%27 fill=%27none%27 stroke=%27%2364ffda%27 stroke-width=%274%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* === Design Tokens === */
+:root {
+  --space-xs: 4px;  --space-sm: 8px;  --space-md: 16px;
+  --space-lg: 24px;  --space-xl: 32px;  --space-2xl: 48px;
+  --space-3xl: 64px;  --space-4xl: 96px;  --space-5xl: 128px;
+  --text-xs: 0.75rem;  --text-sm: 0.875rem;  --text-base: 1rem;
+  --text-lg: 1.125rem;  --text-xl: 1.25rem;  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;  --text-4xl: 2.25rem;
+  --bg-deep: #06060d;  --bg-primary: #0b0b16;
+  --bg-surface: #12121f;  --bg-surface-hover: #18182a;
+  --bg-elevated: #1a1a30;
+  --accent: #64ffda;  --accent-dim: #3db892;
+  --accent-glow: rgba(100,255,218,0.25);
+  --accent-subtle: rgba(100,255,218,0.08);
+  --text-primary: #e8e8f4;  --text-secondary: #9090b0;
+  --text-tertiary: #5c5c80;  --text-inverse: #06060d;
+  --border-subtle: #ffffff0a;  --border-default: #ffffff10;
+  --border-accent: rgba(100,255,218,0.2);
+  --focus-ring: #64ffda;
+  --radius-sm: 4px;  --radius-md: 8px;  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  --shadow-glow: 0 0 24px var(--accent-glow);
+  --z-bg: 0;  --z-content: 1;  --z-overlay: 50;  --z-nav: 100;  --z-cursor: 200;
+  --ease-out: cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out: cubic-bezier(0.65,0,0.35,1);
+  --duration-fast: 150ms;  --duration-base: 250ms;  --duration-slow: 400ms;
+  --max-width: 1200px;  --content-pad: 8%;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,-apple-system,sans-serif;line-height:1.7;overflow-x:hidden}
+.skip-link{position:absolute;top:-100%;left:var(--space-md);z-index:var(--z-nav);background:var(--accent);color:var(--text-inverse);padding:var(--space-sm) var(--space-lg);border-radius:var(--radius-sm);font-weight:600;text-decoration:none;font-size:var(--text-sm)}
+.skip-link:focus{top:var(--space-md)}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:var(--z-bg);pointer-events:none}
+canvas#grid{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.6}
+nav{position:fixed;top:0;left:0;right:0;z-index:var(--z-nav);padding:var(--space-lg) var(--content-pad);display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}
+nav .logo{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:-0.5px}
+nav .links{display:flex;gap:var(--space-xl);list-style:none}
+nav .links a{color:#ffffffcc;text-decoration:none;font-size:var(--text-sm);letter-spacing:1px;transition:color var(--duration-base) var(--ease-out);padding:var(--space-xs) 0;position:relative}
+nav .links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--accent);transition:width var(--duration-base) var(--ease-out)}
+nav .links a:hover{color:var(--accent)}
+nav .links a:hover::after{width:100%}
+nav .links a:focus-visible{outline:2px solid var(--focus-ring);outline-offset:4px;border-radius:2px}
+main{position:relative;z-index:var(--z-content)}
+section.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 var(--content-pad);position:relative}
+.hero .tag{font-family:'Cascadia Code','Fira Code','Consolas',monospace;color:var(--accent);font-size:var(--text-base);letter-spacing:2px;margin-bottom:var(--space-lg)}
+.hero h1{font-size:clamp(3rem,8vw,6.5rem);font-weight:800;line-height:1.05;letter-spacing:-1px;color:#f0f0fa}
+.hero h1 .hl{color:var(--accent)}
+.hero .sub{font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text-secondary);margin-top:var(--space-lg);max-width:640px;font-weight:300;line-height:1.8}
+.hero .cta{margin-top:var(--space-2xl);display:flex;gap:var(--space-md);flex-wrap:wrap}
+.hero .cta a{padding:14px 36px;border-radius:var(--radius-sm);font-weight:600;text-decoration:none;font-size:var(--text-base);letter-spacing:0.5px;transition:all var(--duration-base) var(--ease-out);position:relative}
+.hero .cta a:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+.hero .cta .primary{background:var(--accent);color:var(--text-inverse)}
+.hero .cta .primary:hover{box-shadow:var(--shadow-glow)}
+.hero .cta .primary:active{transform:scale(0.97)}
+.hero .cta .ghost{border:1.5px solid var(--accent);color:var(--accent)}
+.hero .cta .ghost:hover{background:var(--accent-subtle)}
+.hero .cta .ghost:active{transform:scale(0.97)}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:var(--space-sm);color:var(--text-secondary);font-size:var(--text-xs);letter-spacing:2px}
+.scroll-indicator .line{width:1px;height:40px;background:linear-gradient(transparent,var(--accent));animation:pulse-line 2s infinite}
+@keyframes pulse-line{0%,100%{opacity:.3}50%{opacity:1}}
+section:not(.hero){padding:var(--space-4xl) var(--content-pad)}
+.section-label{font-family:'Cascadia Code','Fira Code','Consolas',monospace;color:var(--accent);font-size:var(--text-sm);letter-spacing:3px;margin-bottom:var(--space-sm);text-transform:uppercase}
+h2{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#f0f0fa;letter-spacing:-0.5px;margin-bottom:var(--space-2xl);line-height:1.2;max-width:24ch}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.about-text p{color:var(--text-secondary);font-size:var(--text-lg);margin-bottom:var(--space-lg);line-height:1.85;max-width:60ch}
+.about-text .highlight{color:var(--accent);font-weight:600}
+.about-text code{font-family:'Cascadia Code','Fira Code','Consolas',monospace;background:var(--bg-surface);padding:1px 6px;border-radius:3px;font-size:0.9em;color:var(--accent)}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg)}
+.about-stats.full{grid-template-columns:repeat(4,1fr);margin-top:var(--space-2xl)}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:28px;transition:border-color var(--duration-base) var(--ease-out),background var(--duration-base) var(--ease-out),transform var(--duration-base) var(--ease-out)}
+.stat-card:hover{border-color:var(--accent);background:var(--bg-surface-hover);transform:translateY(-2px)}
+.stat-card:focus-within{border-color:var(--accent)}
+.stat-card .num{font-size:2.5rem;font-weight:800;color:var(--accent);font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-feature-settings:"tnum"}
+.stat-card .lbl{font-size:var(--text-sm);color:var(--text-secondary);margin-top:var(--space-xs)}
+/* Philosophy blocks */
+.philosophy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--space-lg)}
+.philosophy-item{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:var(--space-2xl);transition:border-color var(--duration-base) var(--ease-out),transform var(--duration-base) var(--ease-out)}
+.philosophy-item:hover{border-color:var(--border-accent);transform:translateY(-2px)}
+.philosophy-item .icon{width:40px;height:40px;margin-bottom:var(--space-lg);color:var(--accent)}
+.philosophy-item h3{font-size:var(--text-xl);font-weight:700;color:var(--text-primary);margin-bottom:var(--space-sm)}
+.philosophy-item p{color:var(--text-secondary);font-size:var(--text-base);line-height:1.8}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-lg)}
+.skill-item{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:var(--space-lg);transition:border-color var(--duration-base) var(--ease-out),transform var(--duration-base) var(--ease-out)}
+.skill-item:hover{border-color:var(--border-accent);transform:translateY(-1px)}
+.skill-item .name{font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.skill-item .name span:last-child{color:var(--accent);font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:var(--text-sm)}
+.skill-item .bar{height:4px;background:var(--border-subtle);border-radius:2px;overflow:hidden}
+.skill-item .bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),#48b5c4);border-radius:2px;width:0;transition:width 1.2s var(--ease-out)}
+/* Callout / Quote */
+.callout{border-left:3px solid var(--accent);padding:var(--space-lg) var(--space-2xl);margin:var(--space-3xl) 0;background:var(--accent-subtle);border-radius:0 var(--radius-md) var(--radius-md) 0}
+.callout p{color:var(--text-primary);font-size:var(--text-xl);font-weight:400;line-height:1.7;font-style:italic;max-width:48ch}
+.callout .attr{color:var(--accent);font-size:var(--text-sm);margin-top:var(--space-md);font-style:normal;font-weight:600;letter-spacing:1px}
+.foot{text-align:center;padding:60px var(--content-pad);border-top:1px solid var(--border-subtle);position:relative;z-index:var(--z-content)}
+.foot .copy{color:var(--text-tertiary);font-size:var(--text-sm)}
+.foot .beian{color:var(--text-tertiary);font-size:var(--text-sm);margin-top:var(--space-md)}
+.foot .beian a{color:var(--text-tertiary);text-decoration:none;transition:color var(--duration-base) var(--ease-out)}
+.foot .beian a:hover{color:var(--accent)}
+.foot .beian a:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px;border-radius:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:2px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}.scroll-indicator .line{animation:none}canvas#bg,canvas#grid{display:none}}
+@media(max-width:768px){:root{--content-pad:6%}.about-grid{grid-template-columns:1fr;gap:40px}.about-stats{grid-template-columns:1fr 1fr}.about-stats.full{grid-template-columns:1fr 1fr}.philosophy-grid{grid-template-columns:1fr}nav .links{display:none}section:not(.hero){padding:80px var(--content-pad)}}
+@media(max-width:480px){.about-stats{grid-template-columns:1fr}.about-stats.full{grid-template-columns:1fr}.skills-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<canvas id="bg"></canvas>
+<canvas id="grid"></canvas>
+
+<nav aria-label="主导航">
+  <div class="logo">Qingbo Li</div>
+  <ul class="links" role="list">
+    <li><a href="#about" aria-label="关于我">关于</a></li>
+    <li><a href="#philosophy" aria-label="我的理念">理念</a></li>
+    <li><a href="#skills" aria-label="技术技能">技能</a></li>
+    <li><a href="mailto:liqingbo@example.com" aria-label="发送邮件联系">联系</a></li>
+  </ul>
+</nav>
+
+<main id="main-content">
+
+<section class="hero" id="hero" aria-label="主页横幅">
+  <div class="tag">Hello, world &mdash;</div>
+  <h1>我是 <span class="hl">李清波</span></h1>
+  <p class="sub">计算机科学与技术专业。六年如一日在 0 和 1 的世界里造轮子、拆系统、撕 bug。从裸机汇编到云端微服务，从手写语法树到调参炼丹，我可以为一行代码熬到天亮，也可以为一个架构画满整面白板。不是卷，是痴。</p>
+  <div class="cta">
+    <a href="#about" class="primary">了解我的故事</a>
+    <a href="mailto:liqingbo@example.com" class="ghost">联系我</a>
+  </div>
+  <div class="scroll-indicator" aria-hidden="true">
+    <span>SCROLL</span>
+    <div class="line"></div>
+  </div>
+</section>
+
+<section id="about" aria-label="关于我">
+  <div class="section-label">// 关于我</div>
+  <h2>不仅写代码，<br>更在构建未来。</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>你好，我是<span class="highlight">李清波</span>，一名计算机科学与技术专业的深度患者。不是那种「会写几行 Python 就自称程序员」的速成选手——我是从晶体管逻辑门开始啃、从 <code>gcc -S</code> 看汇编输出、从 Linux 0.11 源码一行行读过来的苦行僧。</p>
+      <p>数据结构与算法于我而言不是八股文，是肌肉记忆。能在白板上徒手写出红黑树 rotate，也能在系统设计面试时从 C10K 聊到 C10M，从 epoll 聊到 io_uring，从单体聊到 CQRS + Event Sourcing，面不改色。</p>
+      <p>我相信<span class="highlight">真正的工程师不挑语言</span>。C 的锋利、Rust 的严苛、Go 的务实、Python 的灵巧、TypeScript 的表达力——每种语言都是一把不同形状的刀，关键是你握刀的手够不够稳。而我的手，很稳。</p>
+      <p>做过高并发秒杀系统，QPS 从 800 压到 8000，瓶颈不在代码在数据库；写过自研 RPC 框架，协议层手搓的，序列化比 Protobuf 还快 15%；带过五人小团队三个月从零交付一套 SaaS 平台，甲方验收那天说「这次终于没踩坑」。</p>
+      <p>目前深耕<span class="highlight">全栈架构设计与系统性能优化</span>。白天写代码，晚上读论文，周末给开源项目提 PR。不是职业，是呼吸。</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-card" tabindex="0" aria-label="完成超过80个项目">
+        <div class="num" data-target="80">0</div>
+        <div class="lbl">交付上线项目</div>
+      </div>
+      <div class="stat-card" tabindex="0" aria-label="掌握15个技术栈">
+        <div class="num" data-target="15">0</div>
+        <div class="lbl">精通技术栈</div>
+      </div>
+      <div class="stat-card" tabindex="0" aria-label="开源贡献5年">
+        <div class="num" data-target="5">0</div>
+        <div class="lbl">开源贡献 (年)</div>
+      </div>
+      <div class="stat-card" tabindex="0" aria-label="代码提交二十万行">
+        <div class="num" data-target="200000">0</div>
+        <div class="lbl">代码提交行数</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p>"他不是那种做完需求就走的人——他会追问为什么需要这个需求，然后给你一个比原方案好三倍的实现。"</p>
+    <div class="attr">—— 某位合作过的产品经理</div>
+  </div>
+</section>
+
+<section id="philosophy" aria-label="我的技术理念">
+  <div class="section-label">// 我的信条</div>
+  <h2>代码是有价值观的。</h2>
+  <div class="philosophy-grid">
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <h3>追求本质</h3>
+      <p>不满足于"能跑就行"。每个抽象都追问为什么，每层封装都计算代价。我写的不是特性，是负债表上最小的一行。</p>
+    </div>
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <h3>不设边界</h3>
+      <p>前端工程师？后端工程师？这些标签对我来说毫无意义。我写 React 组件像写 Java Service 一样严谨，写 SQL 像写诗一样斟酌索引。</p>
+    </div>
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <h3>手上见真章</h3>
+      <p>文档写得好不如代码能跑。讨论三天架构不如花三小时写一个可工作的原型。Talk is cheap, show me the <code>diff</code>.</p>
+    </div>
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <h3>极致性能</h3>
+      <p>首屏加载超过一秒？P99 延迟抖动？GC 停顿影响吞吐？在我这里没有「差不多」。性能优化的终点是你再往下优化边际收益为零的那一刻。</p>
+    </div>
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <h3>技术布道</h3>
+      <p>写博客、做分享、带新人。一个好的技术方案应该能在一张餐巾纸上讲清楚。我享受把复杂的系统画成三张图、让非技术同事也能听懂的成就感。</p>
+    </div>
+    <div class="philosophy-item">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+      <h3>终身学习</h3>
+      <p>每周啃一篇系统领域顶会论文，每季度深入一门新语言。两年掌握了 Rust 的所有权和 borrow checker，三年把分布式一致性协议吃透到能徒手推演 Raft 选举过程。学无止境。</p>
+    </div>
+  </div>
+
+  <div class="about-stats full">
+    <div class="stat-card" tabindex="0" aria-label="3年团队领导经验">
+      <div class="num" data-target="3">0</div>
+      <div class="lbl">团队领导 (年)</div>
+    </div>
+    <div class="stat-card" tabindex="0" aria-label="系统可用性百分之九十九点九九">
+      <div class="num" data-target="99.99">0</div>
+      <div class="lbl">系统可用性 (%)</div>
+    </div>
+    <div class="stat-card" tabindex="0" aria-label="技术分享36场">
+      <div class="num" data-target="36">0</div>
+      <div class="lbl">技术分享 (场)</div>
+    </div>
+    <div class="stat-card" tabindex="0" aria-label="GitHub Stars累计800">
+      <div class="num" data-target="800">0</div>
+      <div class="lbl">GitHub Stars</div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" aria-label="技术能力">
+  <div class="section-label">// 技术能力</div>
+  <h2>我的武器库</h2>
+  <div class="skills-grid">
+    <div class="skill-item">
+      <div class="name"><span>数据结构与算法</span><span>98%</span></div>
+      <div class="bar"><div class="fill" data-width="98"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>操作系统 &amp; Linux 内核</span><span>90%</span></div>
+      <div class="bar"><div class="fill" data-width="90"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>计算机网络 &amp; 协议栈</span><span>92%</span></div>
+      <div class="bar"><div class="fill" data-width="92"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>数据库系统 &amp; SQL 优化</span><span>88%</span></div>
+      <div class="bar"><div class="fill" data-width="88"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>分布式系统设计</span><span>85%</span></div>
+      <div class="bar"><div class="fill" data-width="85"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>前端开发 React/Vue/TS/Next</span><span>93%</span></div>
+      <div class="bar"><div class="fill" data-width="93"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>后端开发 Node/Python/Java/Go</span><span>91%</span></div>
+      <div class="bar"><div class="fill" data-width="91"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>系统编程 C/C++/Rust</span><span>82%</span></div>
+      <div class="bar"><div class="fill" data-width="82"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>DevOps &amp; 云原生 / K8s / Docker</span><span>86%</span></div>
+      <div class="bar"><div class="fill" data-width="86"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>机器学习 &amp; 深度学习</span><span>75%</span></div>
+      <div class="bar"><div class="fill" data-width="75"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>高性能网络编程</span><span>84%</span></div>
+      <div class="bar"><div class="fill" data-width="84"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="name"><span>编译原理 &amp; 语言设计</span><span>78%</span></div>
+      <div class="bar"><div class="fill" data-width="78"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot" role="contentinfo">
+  <p class="copy">&copy; 2026 李清波. Designed &amp; Built with passion.</p>
+  <p class="beian">
+    <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" aria-label="备案号 粤ICP备2025498176号，前往工信部备案查询">粤ICP备2025498176号</a>
+  </p>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+(function(){var c=document.getElementById('grid'),t=c.getContext('2d'),gw,gh,CELL=40;function rs(){var d=devicePixelRatio||1;gw=c.width=innerWidth*d;gh=c.height=innerHeight*d;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';t.setTransform(1,0,0,1,0,0);t.scale(d,d)}addEventListener('resize',rs);rs();function dr(){t.clearRect(0,0,gw,gh);var w=innerWidth,h=innerHeight;t.fillStyle='rgba(100,255,218,0.015)';for(var x=0;x<w;x+=CELL)for(var y=0;y<h;y+=CELL)t.fillRect(x,y,1,1);requestAnimationFrame(dr)}dr()})();
+
+(function(){var cv=document.getElementById('bg'),ctx=cv.getContext('2d'),w,h,dpr,ps=[],PCOUNT=100,PSIZE=3,mx=-200,my=-200,ma=false;function rs(){dpr=devicePixelRatio||1;w=cv.width=innerWidth*dpr;h=cv.height=innerHeight*dpr;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr)}addEventListener('resize',rs);rs();addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;ma=true});addEventListener('mouseleave',function(){ma=false});addEventListener('touchmove',function(e){mx=e.touches[0].clientX;my=e.touches[0].clientY;ma=true},{passive:true});addEventListener('touchend',function(){ma=false});function PP(){this.reset(true)}PP.prototype.reset=function(init){this.x=Math.random()*innerWidth;this.y=init?Math.random()*innerHeight:-(40*Math.random()+10);this.gx=Math.round(this.x/PSIZE)*PSIZE;this.gy=Math.round(this.y/PSIZE)*PSIZE;this.vx=(Math.random()-0.5)*0.4;this.vy=Math.random()*0.3+0.15;this.alpha=Math.random()*0.5+0.2;this.size=(Math.floor(Math.random()*2)+1)*PSIZE};PP.prototype.update=function(){var ww=innerWidth,wh=innerHeight;if(ma){var dx=this.gx-mx,dy=this.gy-my,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150){var f=(150-dist)/150;if(dist>1){this.gx+=dx/dist*f*1.5;this.gy+=dy/dist*f*1.5}this.alpha=Math.min(1,this.alpha+f*0.5)}}this.gx+=this.vx;this.gy+=this.vy;if(!ma)this.alpha*=0.998;else this.alpha*=0.995;if(this.gy>wh+20)this.reset(false);if(this.gx<-20)this.gx=ww+20;if(this.gx>ww+20)this.gx=-20};PP.prototype.draw=function(){ctx.fillStyle='rgba(100,255,218,'+this.alpha+')';ctx.fillRect(this.gx,this.gy,this.size,this.size)};for(var i=0;i<PCOUNT;i++)ps.push(new PP());function anim(){ctx.clearRect(0,0,w,h);for(var i=0;i<ps.length;i++){ps[i].update();ps[i].draw();for(var j=i+1;j<ps.length;j++){var dx=ps[i].gx-ps[j].gx,dy=ps[i].gy-ps[j].gy,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.fillStyle='rgba(100,255,218,'+(0.06*(1-dist/90))+')';var steps=Math.floor(dist/PSIZE);for(var s=0;s<steps;s++){var t=s/steps,px=Math.round((ps[i].gx+dx*t)/PSIZE)*PSIZE,py=Math.round((ps[i].gy+dy*t)/PSIZE)*PSIZE;ctx.fillRect(px,py,PSIZE,PSIZE)}}}}requestAnimationFrame(anim)}anim()})();
+
+var pr=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+if(!pr){
+  gsap.timeline({defaults:{ease:'power3.out'}})
+    .from('nav',{y:-60,opacity:0,duration:0.8})
+    .from('.hero .tag',{y:30,opacity:0,duration:0.6},'-=0.4')
+    .from('.hero h1',{y:40,opacity:0,duration:0.7},'-=0.3')
+    .from('.hero .sub',{y:30,opacity:0,duration:0.6},'-=0.4')
+    .from('.hero .cta a',{y:20,opacity:0,duration:0.5,stagger:0.12},'-=0.3')
+    .from('.scroll-indicator',{opacity:0,duration:0.5},'-=0.2');
+  setTimeout(function(){
+    ScrollTrigger.refresh();
+    gsap.utils.toArray('.stat-card .num').forEach(function(el){
+      var t=+el.dataset.target;
+      gsap.to(el,{innerText:t,duration:2,snap:{innerText:1},ease:'power2.out',scrollTrigger:{trigger:'#about',start:'top 70%'}})
+    });
+    gsap.from('.about-text p',{scrollTrigger:{trigger:'#about',start:'top 65%'},y:30,opacity:0,duration:0.6,stagger:0.15,ease:'power2.out'});
+    gsap.from('.stat-card',{scrollTrigger:{trigger:'#about',start:'top 65%'},y:40,opacity:0,duration:0.5,stagger:0.1,ease:'power2.out'});
+    gsap.from('.callout',{scrollTrigger:{trigger:'#about',start:'top 50%'},y:30,opacity:0,duration:0.7,ease:'power2.out'});
+    gsap.from('.philosophy-item',{scrollTrigger:{trigger:'#philosophy',start:'top 65%'},y:40,opacity:0,duration:0.5,stagger:0.08,ease:'power2.out'});
+    gsap.utils.toArray('section').forEach(function(sec){
+      var lb=sec.querySelector('.section-label'),h2=sec.querySelector('h2');
+      if(lb)gsap.from(lb,{scrollTrigger:{trigger:sec,start:'top 75%'},y:20,opacity:0,duration:0.5,ease:'power2.out'});
+      if(h2)gsap.from(h2,{scrollTrigger:{trigger:sec,start:'top 75%'},y:30,opacity:0,duration:0.6,ease:'power2.out'})
+    });
+    gsap.utils.toArray('.skill-item .fill').forEach(function(b){
+      gsap.to(b,{scrollTrigger:{trigger:'#skills',start:'top 65%'},width:b.dataset.width+'%',duration:1.2,ease:'power3.out'})
+    });
+    gsap.from('.skill-item',{scrollTrigger:{trigger:'#skills',start:'top 65%'},y:30,opacity:0,duration:0.5,stagger:0.08,ease:'power2.out'})
+  },200)
+}else{
+  gsap.set('.stat-card .num',{innerText:function(i,v){return this.dataset.target}});
+  gsap.set('.skill-item .fill',{width:function(i,v){return this.dataset.width+'%'}})
+}
+</script>
+</body>
+</html>
